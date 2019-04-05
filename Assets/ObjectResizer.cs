@@ -23,8 +23,8 @@ public class ObjectResizer : EditorWindow
         selectedObject =  Selection.activeGameObject;
         if (selectedObject)
         {
-            getHeightAsString();
-            getExtentsAsStrng();
+            getHeight();
+            getExtents();
         }
         else
         {
@@ -32,18 +32,30 @@ public class ObjectResizer : EditorWindow
             extents = null;
         }
 
-        EditorGUILayout.TextField("Object Height",height);
-        EditorGUILayout.TextField("Oject extents Y", extents);
+        height = EditorGUILayout.TextField("Object Height", height);
+        extents = EditorGUILayout.TextField("Oject extents Y", extents);
         
     }
 
-    private void getHeightAsString()
+    private void getHeight()
     {
-        height = selectedObject.GetComponent<MeshFilter>().mesh.bounds.size.y.ToString();
+        float heightToTransform;
+        float tHeight;
+
+        if (height == null) height = selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y.ToString();
+
+        if (height != selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y.ToString())
+        {
+            float.TryParse(height, out tHeight);
+            heightToTransform = tHeight / selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y;
+            Debug.Log(heightToTransform);
+            selectedObject.GetComponent<Transform>().localScale *= heightToTransform;
+            height = selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y.ToString();
+        }
     }
 
-    private void getExtentsAsStrng()
+    private void getExtents()
     {
-        extents = selectedObject.GetComponent<MeshFilter>().mesh.bounds.extents.y.ToString();
+        extents = selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.extents.y.ToString();
     }
 }
