@@ -9,6 +9,8 @@ public class ObjectResizer : EditorWindow
     private GameObject selectedObject;
 
     private string height;
+    private string width;
+    private string depth;
 
     private float xScale;
     private float yScale;
@@ -30,14 +32,20 @@ public class ObjectResizer : EditorWindow
         {
             getScale();
             getHeight();
+            getWidth();
+            getDepth();
         }
         else
         {
             height = null;
+            width = null;
+            depth = null;
         }
 
-        height = EditorGUILayout.TextField("Object Height", height);
-        scale = EditorGUILayout.Toggle("Scale", scale);
+        scale = EditorGUILayout.Toggle("Scale Object", scale);
+        width = EditorGUILayout.TextField("Object Width (X-axis)", width);
+        height = EditorGUILayout.TextField("Object Height (Y-axis)", height);
+        depth = EditorGUILayout.TextField("Object Length (Z-axis)", depth);
     }
 
     private void getHeight()
@@ -58,8 +66,59 @@ public class ObjectResizer : EditorWindow
                 else selectedObject.GetComponent<Transform>().localScale -= new Vector3(0f, (1 - heightToTransform) * yScale, 0f);
             }    
             getScale();
-            height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+            UpdateAxis();
         }
+    }
+
+    private void getWidth()
+    {
+        float widthToTransform;
+        float fWidth;
+        float.TryParse(width, out fWidth);
+
+        if (width == null) width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+
+        else if (System.Math.Round(fWidth, 3) != System.Math.Round((selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale), 3))
+        {
+            widthToTransform = fWidth / (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale);
+            if (scale) selectedObject.GetComponent<Transform>().localScale *= widthToTransform;
+            else
+            {
+                if (widthToTransform > 1) selectedObject.GetComponent<Transform>().localScale += new Vector3((widthToTransform - 1) * xScale, 0f, 0f);
+                else selectedObject.GetComponent<Transform>().localScale -= new Vector3((1 - widthToTransform) * xScale, 0f, 0f);
+            }
+            getScale();
+            UpdateAxis();
+        }
+    }
+
+    private void getDepth()
+    {
+        float depthToTransform;
+        float fDepth;
+        float.TryParse(depth, out fDepth);
+
+        if (depth == null) depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+
+        else if (System.Math.Round(fDepth, 3) != System.Math.Round((selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale), 3))
+        {
+            depthToTransform = fDepth / (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale);
+            if (scale) selectedObject.GetComponent<Transform>().localScale *= depthToTransform;
+            else
+            {
+                if (depthToTransform > 1) selectedObject.GetComponent<Transform>().localScale += new Vector3(0f, 0f, (depthToTransform - 1) * zScale);
+                else selectedObject.GetComponent<Transform>().localScale -= new Vector3(0f, 0f, (1 - depthToTransform) * zScale);
+            }
+            getScale();
+            UpdateAxis();
+        }
+    }
+
+    private void UpdateAxis()
+    {
+        height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+        width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+        depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
     }
 
     private void getScale()
