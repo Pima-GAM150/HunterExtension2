@@ -18,6 +18,8 @@ public class ObjectResizer : EditorWindow
 
     private bool scale;
 
+    private bool reset;
+
     [MenuItem("Window/Object Resizer")]
     static void Init()
     {
@@ -28,7 +30,7 @@ public class ObjectResizer : EditorWindow
     void OnGUI()
     {
         selectedObject =  Selection.activeGameObject;
-        if (selectedObject)
+        if (selectedObject && !reset)
         {
             getScale();
             getHeight();
@@ -46,6 +48,8 @@ public class ObjectResizer : EditorWindow
         width = EditorGUILayout.TextField("Object Width (X-axis)", width);
         height = EditorGUILayout.TextField("Object Height (Y-axis)", height);
         depth = EditorGUILayout.TextField("Object Length (Z-axis)", depth);
+        reset = EditorGUILayout.Toggle("Reset scale to 1", reset);
+        if (reset) resetObject();
     }
 
     private void getHeight()
@@ -126,5 +130,13 @@ public class ObjectResizer : EditorWindow
         xScale = selectedObject.GetComponent<Transform>().localScale.x;
         yScale = selectedObject.GetComponent<Transform>().localScale.y;
         zScale = selectedObject.GetComponent<Transform>().localScale.z;
+    }
+
+    private void resetObject()
+    {
+        selectedObject.GetComponent<Transform>().localScale = new Vector3(1f, 1f, 1f);
+        height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+        width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+        depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
     }
 }
