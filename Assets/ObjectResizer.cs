@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEditor;
-using UnityEditor.IMGUI.Controls;
 
 public class ObjectResizer : EditorWindow
 {
@@ -71,6 +69,7 @@ public class ObjectResizer : EditorWindow
             }    
             getScale();
             UpdateAxis();
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
     }
 
@@ -93,6 +92,7 @@ public class ObjectResizer : EditorWindow
             }
             getScale();
             UpdateAxis();
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
     }
 
@@ -115,6 +115,7 @@ public class ObjectResizer : EditorWindow
             }
             getScale();
             UpdateAxis();
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
     }
 
