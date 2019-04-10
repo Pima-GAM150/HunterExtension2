@@ -139,5 +139,6 @@ public class ObjectResizer : EditorWindow
         height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
         width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
         depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
     }
 }
