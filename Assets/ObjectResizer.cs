@@ -1,10 +1,12 @@
 ﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ObjectResizer : EditorWindow
 {
-    private GameObject selectedObject;
+    private GameObject[] sceneSelection;
+    private GameObject[] selectedObjects;
 
     private string height;
     private string width;
@@ -13,6 +15,8 @@ public class ObjectResizer : EditorWindow
     private float xScale;
     private float yScale;
     private float zScale;
+
+    private int bigestSelection;
 
     private bool scale;
 
@@ -27,8 +31,10 @@ public class ObjectResizer : EditorWindow
 
     void OnGUI()
     {
-        selectedObject =  Selection.activeGameObject;
-        if (selectedObject && !reset)
+        sceneSelection = Selection.gameObjects;
+        GetSelectedObjects();
+        GetBigestSelection();
+        if (selectedObjects.Length > 0 && !reset)
         {
             getScale();
             getHeight();
@@ -56,17 +62,20 @@ public class ObjectResizer : EditorWindow
         float fHeight;
         float.TryParse(height, out fHeight);
 
-        if (height == null) height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+        if (height == null) height = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
 
-        else if(System.Math.Round(fHeight,3) != System.Math.Round((selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale),3))
+        else if(System.Math.Round(fHeight,3) != System.Math.Round((selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale),3))
         {
-            heightToTransform = fHeight / (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale);
-            if (scale) selectedObject.GetComponent<Transform>().localScale *= heightToTransform;
-            else
+            heightToTransform = fHeight / (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale);
+            foreach (GameObject i in selectedObjects)
             {
-                if (heightToTransform > 1) selectedObject.GetComponent<Transform>().localScale += new Vector3(0f, (heightToTransform - 1)*yScale, 0f);
-                else selectedObject.GetComponent<Transform>().localScale -= new Vector3(0f, (1 - heightToTransform) * yScale, 0f);
-            }    
+                if (scale) i.GetComponent<Transform>().localScale *= heightToTransform;
+                else
+                {
+                    if (heightToTransform > 1) i.GetComponent<Transform>().localScale += new Vector3(0f, (heightToTransform - 1) * yScale, 0f);
+                    else i.GetComponent<Transform>().localScale -= new Vector3(0f, (1 - heightToTransform) * yScale, 0f);
+                }
+            }           
             getScale();
             UpdateAxis();
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -79,17 +88,20 @@ public class ObjectResizer : EditorWindow
         float fWidth;
         float.TryParse(width, out fWidth);
 
-        if (width == null) width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+        if (width == null) width = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
 
-        else if (System.Math.Round(fWidth, 3) != System.Math.Round((selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale), 3))
+        else if (System.Math.Round(fWidth, 3) != System.Math.Round((selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale), 3))
         {
-            widthToTransform = fWidth / (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale);
-            if (scale) selectedObject.GetComponent<Transform>().localScale *= widthToTransform;
-            else
+            widthToTransform = fWidth / (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale);
+            foreach (GameObject i in selectedObjects)
             {
-                if (widthToTransform > 1) selectedObject.GetComponent<Transform>().localScale += new Vector3((widthToTransform - 1) * xScale, 0f, 0f);
-                else selectedObject.GetComponent<Transform>().localScale -= new Vector3((1 - widthToTransform) * xScale, 0f, 0f);
-            }
+                if (scale) i.GetComponent<Transform>().localScale *= widthToTransform;
+                else
+                {
+                    if (widthToTransform > 1) i.GetComponent<Transform>().localScale += new Vector3((widthToTransform - 1) * xScale, 0f, 0f);
+                    else i.GetComponent<Transform>().localScale -= new Vector3((1 - widthToTransform) * xScale, 0f, 0f);
+                }
+            }          
             getScale();
             UpdateAxis();
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -102,17 +114,20 @@ public class ObjectResizer : EditorWindow
         float fDepth;
         float.TryParse(depth, out fDepth);
 
-        if (depth == null) depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+        if (depth == null) depth = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
 
-        else if (System.Math.Round(fDepth, 3) != System.Math.Round((selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale), 3))
+        else if (System.Math.Round(fDepth, 3) != System.Math.Round((selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale), 3))
         {
-            depthToTransform = fDepth / (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale);
-            if (scale) selectedObject.GetComponent<Transform>().localScale *= depthToTransform;
-            else
+            depthToTransform = fDepth / (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale);
+            foreach(GameObject i in selectedObjects)
             {
-                if (depthToTransform > 1) selectedObject.GetComponent<Transform>().localScale += new Vector3(0f, 0f, (depthToTransform - 1) * zScale);
-                else selectedObject.GetComponent<Transform>().localScale -= new Vector3(0f, 0f, (1 - depthToTransform) * zScale);
-            }
+                if (scale) i.GetComponent<Transform>().localScale *= depthToTransform;
+                else
+                {
+                    if (depthToTransform > 1) i.GetComponent<Transform>().localScale += new Vector3(0f, 0f, (depthToTransform - 1) * zScale);
+                    else i.GetComponent<Transform>().localScale -= new Vector3(0f, 0f, (1 - depthToTransform) * zScale);
+                }
+            }   
             getScale();
             UpdateAxis();
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -121,24 +136,54 @@ public class ObjectResizer : EditorWindow
 
     private void UpdateAxis()
     {
-        height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
-        width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
-        depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+        height = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+        width = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+        depth = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
     }
 
     private void getScale()
     {
-        xScale = selectedObject.GetComponent<Transform>().localScale.x;
-        yScale = selectedObject.GetComponent<Transform>().localScale.y;
-        zScale = selectedObject.GetComponent<Transform>().localScale.z;
+        xScale = selectedObjects[bigestSelection].GetComponent<Transform>().localScale.x;
+        yScale = selectedObjects[bigestSelection].GetComponent<Transform>().localScale.y;
+        zScale = selectedObjects[bigestSelection].GetComponent<Transform>().localScale.z;
     }
 
     private void resetObject()
     {
-        selectedObject.GetComponent<Transform>().localScale = new Vector3(1f, 1f, 1f);
-        height = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
-        width = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
-        depth = (selectedObject.GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+        foreach (GameObject i in selectedObjects)
+        {
+            selectedObjects[bigestSelection].GetComponent<Transform>().localScale = new Vector3(1f, 1f, 1f);
+            height = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.y * yScale).ToString();
+            width = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.x * xScale).ToString();
+            depth = (selectedObjects[bigestSelection].GetComponent<MeshFilter>().sharedMesh.bounds.size.z * zScale).ToString();
+        }
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+    }
+
+    private void GetSelectedObjects()
+    {
+        List<GameObject> temp = new List<GameObject>();
+        foreach(GameObject i in sceneSelection)
+        {
+            MeshFilter[] tem = i.GetComponentsInChildren<MeshFilter>();
+            foreach (MeshFilter j in tem)
+            {
+                temp.Add(j.gameObject);
+            }
+        }
+        selectedObjects = temp.ToArray();
+    }
+
+    private void GetBigestSelection()
+    {
+        int counter = 0;
+        float largestArea = 0;
+        foreach (GameObject i in selectedObjects)
+        {
+            Bounds temp = i.GetComponent<MeshFilter>().sharedMesh.bounds;
+            float area = temp.size.x * temp.size.y * temp.size.z;
+            if (area > largestArea) { largestArea = area; bigestSelection = counter; } 
+            counter++;
+        }
     }
 }
