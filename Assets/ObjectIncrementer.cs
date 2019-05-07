@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 public class ObjectIncrementer : EditorWindow
 {
@@ -35,7 +36,7 @@ public class ObjectIncrementer : EditorWindow
                 {
                     if (axisToggle) i.transform.position -= new Vector3(0f, 0f, float.Parse(increment));
                     if (!axisToggle) i.transform.position -= new Vector3(float.Parse(increment), 0f, 0f);
-                    EditorUtility.SetDirty(i);
+                    EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
                 }
             }
             if (e.keyCode == KeyCode.D)
@@ -44,7 +45,7 @@ public class ObjectIncrementer : EditorWindow
                 {
                     if (axisToggle) i.transform.position += new Vector3(0f, 0f, float.Parse(increment));
                     if (!axisToggle) i.transform.position += new Vector3(float.Parse(increment), 0f, 0f);
-                    EditorUtility.SetDirty(i);
+                    EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
                 }
             }
             if (e.keyCode == KeyCode.W) foreach (GameObject i in selection) i.transform.position += new Vector3(0f, float.Parse(increment), 0f);
